@@ -1,0 +1,1054 @@
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+<meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+<title>Guias</title>
+<link href="jquery-mobile/jquery.mobile-1.0a3.min.css" rel="stylesheet" type="text/css"/>
+<link href="jquery-mobile/guias.min.css" rel="stylesheet" type="text/css"/> 
+<script src="jquery-mobile/jquery-1.5.min.js" type="text/javascript"></script>
+<script src="jquery-mobile/jquery.mobile-1.0a3.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="estilos.css">
+
+
+<script type="text/javascript" charset="utf-8" src="cordova-2.1.0.js"></script>
+	<script type="text/javascript" charset="utf-8">
+    var id;
+	var idDatosGenerales;
+	var idSeleccion;
+	var ciudad;
+	var tipo;
+	var latitud;
+	var longitud;
+	var latitudConsulta;
+	var longitudConsulta;
+	var largo;
+	var titulo;
+	var descripcion;
+	var imagen;
+	var urlCompartir;
+	var arregloCordenadas;
+        // Wait for Cordova to load
+        //
+        document.addEventListener("deviceready", onDeviceReady, false);
+    
+        // Cordova is ready
+        //
+        function onDeviceReady() {
+            var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(populateDB, errorCB, successCB);
+        }
+    
+        // Populate the database 
+        //
+        function populateDB(tx) {
+            
+             tx.executeSql('DROP TABLE IF EXISTS tbl_datosGenerales');
+             tx.executeSql('CREATE TABLE IF NOT EXISTS tbl_datosGenerales (idDatosGenerales INTEGER PRIMARY KEY ASC, nombre VARCHAR(35), direccion VARCHAR(80), latitud DOUBLE, longitud DOUBLE, imagen VARCHAR(20), descripcion VARCHAR(300), ciudad VARCHAR(20), tipo VARCHAR(20), urlCompartir VARCHAR(120))');
+             
+             tx.executeSql('DROP TABLE IF EXISTS tbl_restaurante');
+             tx.executeSql('CREATE TABLE IF NOT EXISTS tbl_restaurante (idRestaurante INTEGER PRIMARY KEY ASC, telefono INTEGER, cocina VARCHAR(30), rangoPrecio VARCHAR(20), pagina VARCHAR(30), idDatosGenerales INTEGER, FOREIGN KEY(idDatosGenerales) REFERENCES tbl_datosGenerales(idDatosGenerales))');
+             
+             tx.executeSql('DROP TABLE IF EXISTS tbl_hotel');
+             tx.executeSql('CREATE TABLE IF NOT EXISTS tbl_hotel (idHotel INTEGER PRIMARY KEY ASC, telefono INTEGER, rangoPrecio VARCHAR(20), categoria VARCHAR(20), pagina VARCHAR(30), idDatosGenerales INTEGER, FOREIGN KEY(idDatosGenerales) REFERENCES tbl_datosGenerales(idDatosGenerales))');	 
+            
+             tx.executeSql('DROP TABLE IF EXISTS tbl_compras');
+             tx.executeSql('CREATE TABLE IF NOT EXISTS tbl_compras (idCompra INTEGER PRIMARY KEY ASC, telefono INTEGER, pagina VARCHAR(30), idDatosGenerales INTEGER, FOREIGN KEY(idDatosGenerales) REFERENCES tbl_datosGenerales(idDatosGenerales))');
+             
+             tx.executeSql('DROP TABLE IF EXISTS tbl_ocio');
+             tx.executeSql('CREATE TABLE IF NOT EXISTS tbl_ocio (idOcio INTEGER PRIMARY KEY ASC, telefono INTEGER, idDatosGenerales INTEGER, FOREIGN KEY(idDatosGenerales) REFERENCES tbl_datosGenerales(idDatosGenerales))');
+                 
+            tx.executeSql('DROP TABLE IF EXISTS tbl_puntoInteres');
+             tx.executeSql('CREATE TABLE IF NOT EXISTS tbl_puntoInteres (idPuntoInteres INTEGER PRIMARY KEY ASC, pagina VARCHAR(30), idDatosGenerales INTEGER, FOREIGN KEY(idDatosGenerales) REFERENCES tbl_datosGenerales(idDatosGenerales))');	 
+			 
+			//tx.executeSql('DROP TABLE IF EXISTS tbl_favoritos');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS tbl_favoritos (idFavoritos INTEGER PRIMARY KEY, nombre VARCHAR(35), descripcion VARCHAR(300), tipo VARCHAR(20), imagen VARCHAR(20), ciudad VARCHAR(20), idDatosGenerales INTEGER, FOREIGN KEY(idDatosGenerales) REFERENCES tbl_datosGenerales(idDatosGenerales))');	 
+             
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("La cobacha", "Carretera internacional km 1982 CP.85430", 27.934724959280604, -110.92747986316681, "cobacha.jpg", "Gran variedad de Mariscos preparados a su gusto","Guaymas", "Restaurantes", "http://i.imgur.com/sAo2M.jpg")');
+     tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6221033635, "Mariscos", "$100 a $500", "", 1)');
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Burger King", "Agustin Garza Lopez 1240 Guaymas centro CP.85400", 27.92573874758145, -110.91704607009888, "burger.jpg", "Hamburgesas", "Guaymas", "Restaurantes", "http://i.imgur.com/sgJRh.jpg")');
+    tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6222225454, "Hamburguesas", "$50 a $100", "www.burgerking.com.mx", 2)');
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Chiltepinos Wings", "Boulevard Agustin Garcia Lopez 971, Las Delicias, 85427 Guaymas centro CP.85400", 27.92522685227125,-110.91311931610107, "chiltepinos.jpg", "Tenemos el mejor ambiente para que disfrutes de nuestros platillos en compania de tu familia y amigos ¡ te esperamos!", "Guaymas", "Restaurantes", "http://i.imgur.com/43Ms9.jpg")');
+    tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6222246245, "Ensaladas, Hamburguesas", "$50 a $150", "www.chiltepinos.com.mx", 3)');
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Los Arbolitos", "Carretera Internacional km 1982 Col. Loma Linda", 27.925762446379682,-110.91706216335297, "arbolitos.jpg", "Mariscos Los Arbolitos de Cajeme, en donde la atención, el gusto y el buen comer se adueñan de ti", "Guaymas", "Restaurantes", "http://i.imgur.com/okXqS.jpg")');
+    tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6222212601, "Mariscos", "$50 a $400", "www.mariscoslosarbolitos.com", 4)');
+    
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Pancho Villa", "Calle 23 Colonia Centro",27.92442614202478,-110.88943272829056, "pancho.jpg", "Comida mexicana en el corazon del centro historico", "Guaymas", "Restaurantes", "http://i.imgur.com/qio8K.jpg")');
+    tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6222240574, "Comida Mexicana", "$50 a $140", "",5)');
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Diego`s", "Garcia lopez 944, Colonia Delicias",27.925231592053755,-110.91069459915161, "diegos.jpg", "Los viernes tenemos mariachis en vivo de 10pm a 2am", "Guaymas", "Restaurantes", "http://i.imgur.com/TfpjO.jpg")');
+      tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6222240088, "Sushi Restaurant Bar", "$100 a $250", "",6)');
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Chinaloa", "Av 16 altos, Guaymas Centro CP. 85400",27.925231592053755,-110.91069459915161, "chinaloa.jpg", "Lugar centrico donde se ofrecen distintos platillos chinos y japoneses", "Guaymas", "Restaurantes", "http://i.imgur.com/pTbQc.jpg")');
+      tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (622215-7660, "Comida China y Japonesa", "$50 a $130", "www.chinaloa.com",7)');
+      
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Hoteles del Sol","Blvd. Benito Juarez ",27.925769871997236,-110.92104524374008, "hotelSol.jpg", "Hotel, Restaurant y Salon de Eventos", "Guaymas", "Hoteles", "http://i.imgur.com/1YjF4.jpg")');
+    tx.executeSql('INSERT INTO tbl_hotel (telefono, rangoPrecio, categoria, pagina, idDatosGenerales) VALUES (6222212901, "500 a 1000", "estrellas-3.jpg", "suitesdelsol@hotmail.com",8)');
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Hotel Armida", "Carretera Internacional salida norte s/n ",27.925103933834105,-110.90789705514908, "armida.jpg", "Hotel, Cafeteria", "Guaymas", "Hoteles", "http://i.imgur.com/l4x5l.jpg")');
+    tx.executeSql('INSERT INTO tbl_hotel (telefono, rangoPrecio, categoria, pagina, idDatosGenerales) VALUES (6222252800, "500 a 1000", "estrellas-4.jpg", "www.hotelarmida.com.mx",9)');
+    
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Santa Rita", "Av Serdan s/n Colonia Centro ",27.924101464023284,-110.90341240167618, "santaRita.jpg", "Hotel blah blah", "Guaymas", "Hoteles", "http://i.imgur.com/rOrDw.jpg")');
+    tx.executeSql('INSERT INTO tbl_hotel (telefono, rangoPrecio, categoria, pagina, idDatosGenerales) VALUES (6222221464, "500 a 800", "estrellas-2.jpg", "", 10)');
+    
+    
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Ley", "Blvd Agustin Garcia Lopez 1000 ",27.92634101142415,-110.9184730052948, "ley.jpg", "Supermercado", "Guaymas", "Compras", "http://i.imgur.com/MKcTE.jpg")');
+    tx.executeSql('INSERT INTO tbl_compras(telefono, pagina, idDatosGenerales) VALUES (6222242483, "www.casaley.com.mx",11)');
+    
+    
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Sams", "Carretera internacional ",27.936052289584165,-110.92695146799088, "sams.jpg", "Tienda Comercial", "Guaymas", "Compras", "http://i.imgur.com/6QxSl.jpg")');
+    tx.executeSql('INSERT INTO tbl_compras(telefono, pagina, idDatosGenerales) VALUES (6222212333, "www.sams.com.mx",12)');
+    
+    
+     tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Bar Oasis", "Reforma s/n Ortiz Rubío, Emp. Sonora", 27.9584373, -110.8066653, "barOasis.jpg", "Ensaladas", "Empalme", "Restaurantes", "http://i.imgur.com/4Lxld.jpg")');
+     tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6222233225, "Ensaladas", "10 a 100", "", 13)');
+    
+    
+     tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Don tamal", "Av. Independencia y callejón colonia Moderna Empalme, Sonora", 27.9631876, -110.816549, "donTamal.jpg", "Comida mexicana", "Empalme", "Restaurantes", "http://i.imgur.com/D06eI.jpg")');
+    tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6221131405, "Mexicana", "5 a 100", "", 14)');
+    
+    
+     tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("La carreta de Jorge", "De la tecnología S/n sector oriente empalme sonora",27.9640614, -110.8086114, "donJorge.jpg", "Los mejores de la región los encuentras con Jorge", "Empalme", "Restaurantes", "http://i.imgur.com/IOlRI.jpg")');
+    tx.executeSql('INSERT INTO tbl_restaurante (telefono, cocina, rangoPrecio, pagina, idDatosGenerales) VALUES (6221331490, "Tacos", "15 a 100", "", 15)');
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Friends Club", "Abelardo L. Rodriguez 6 Col.Centro ",27.922660545505334,-110.88838934898376, "friends.jpg", "Billar, Local de eventos y Bar", "Guaymas", "Diversion", "http://i.imgur.com/GSmLz.jpg")');
+    tx.executeSql('INSERT INTO tbl_ocio(telefono, idDatosGenerales) VALUES (622228765, 16)');
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Ohana", "Abelardo L. Rodriguez 178 Col.Centro ",27.922646325818995,-110.88853150606155, "ohana.jpg", "Local de eventos y Bar", "Guaymas", "Diversion", "http://i.imgur.com/3l4E9.jpg")');
+    tx.executeSql('INSERT INTO tbl_ocio(telefono, idDatosGenerales) VALUES (6222287675, 17)');
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Cyrus", "Ave Serdan y calle 17 Col. Centro ",27.922646325818995,-110.88853150606155, "cyrus.jpg", "Antro", "Guaymas", "Diversion", "http://i.imgur.com/ERntL.jpg")');
+    tx.executeSql('INSERT INTO tbl_ocio(telefono, idDatosGenerales) VALUES (6222287675, 18)');
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Hotel Baluarte", "Calle 4 y Av. Revolución Empalme, Sonora", 27.95688190881169, -110.80749660730362, "baluarte.jpg", "Habitaciones con aire acondionado, tv por cable, estcionamiento exclusivo", "Empalme", "Hoteles", "http://i.imgur.com/05yqc.jpg")');
+     tx.executeSql('INSERT INTO tbl_hotel (telefono, rangoPrecio, categoria, pagina, idDatosGenerales) VALUES (6222231380, "380 a 500", "estrellas-3.jpg", "", 19)');
+    
+     tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Hotel Royal", "Lote 9 M 2 s/n Empalme, Sonora", 27.952451864053, -110.81448376178741, "royal.jpg", "Habitaciones con aire acondionado, tv por cable", "Empalme", "Hoteles", "http://i.imgur.com/2pL6l.jpg")');
+     tx.executeSql('INSERT INTO tbl_hotel (telefono, rangoPrecio, categoria, pagina, idDatosGenerales) VALUES (6222232515, "350 a 500", "estrellas-2.jpg", "", 20)');
+     
+      tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Hotel Plaza", "Niños Heroes y Heroe de Nacozari Empalme, Sonora", 27.95985489415972, -110.81618964672089, "plaza.jpg", "Habitaciones con aire acondionado, tv por cable", "Empalme", "Hoteles", "http://i.imgur.com/4hujG.jpg")');
+     tx.executeSql('INSERT INTO tbl_hotel (telefono, rangoPrecio, categoria, pagina, idDatosGenerales) VALUES (6222232878, "290 a 500", "estrellas-2.jpg", "", 21)');
+     
+     
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Los Tres Presidentes", "Ave Serdan calle 23 y 24 Col. Centro", 27.922971008190803, -110.88856905698776, "tresPresidentes.jpg", "Plaza con 3 monumentos a presidentes de México", "Guaymas", "PuntoInteres", "http://i.imgur.com/GB5pS.jpg")');
+    tx.executeSql('INSERT INTO tbl_puntoInteres(pagina, idDatosGenerales) VALUES ("www.guaymas.gob.mx", 22)');
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Palacio Municipal", "Ave Serdan entre calle 22 y 23 Col. Centro ",27.9234236659285,-110.88939249515533, "palacio.jpg", "Se esta cayendo", "Guaymas", "PuntoInteres", "http://i.imgur.com/CLuuZ.jpg")');
+    tx.executeSql('INSERT INTO tbl_puntoInteres(pagina, idDatosGenerales) VALUES ("www.guaymas.gob.mx", 23)');
+    
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Iglesia San Fernando", "Alfonso Iberri entre calle 24 y 25 Col. Centro ",27.92429816687054,-110.88841885328293, "sanFernando.jpg", "Iglesia de las mas antiguas del puerto", "Guaymas", "PuntoInteres", "http://i.imgur.com/VDLvO.jpg")');
+    tx.executeSql('INSERT INTO tbl_puntoInteres(pagina, idDatosGenerales) VALUES ("www.guaymas.gob.mx", 24)');
+    
+    tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Plaza independencia El tinaco", "Benito Juárez García, Moderna, Empalme, Sonora", 27.959229441578106,-110.81886112689972, "tinaco.jpg", "Fue construído desde la fundación de Empalme en el año de 1907 y es el símbolo de la ciudad, mide aproximadamente 35 metros de altura y 10 metros de diámetro.", "Empalme", "PuntoInteres", "http://i.imgur.com/X1j6A.jpg")');
+     tx.executeSql('INSERT INTO tbl_puntoInteres (pagina, idDatosGenerales) VALUES ("www.empalme.gob.mx", 25)');
+    
+    
+     tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Playas del Cochórit", "Nacosari Empalme, SON 4.6 km N", 27.91763376993305, -110.77437400817871, "cochorit.jpg", "Extensísimas playas de mas de treinta kilómetros de playas virgenes coronadas de dunas blancas y finas.", "Empalme","PuntoInteres", "http://i.imgur.com/BuOq2.jpg")');
+     tx.executeSql('INSERT INTO tbl_puntoInteres (pagina, idDatosGenerales) VALUES ("www.empalme.sonora.gob.mx", 26)');
+    
+    
+     tx.executeSql('INSERT INTO tbl_datosGenerales (nombre, direccion, latitud, longitud, imagen, descripcion, ciudad, tipo, urlCompartir) VALUES ("Museo Ferrocarrilero", "Ave.Ferrocarril y calle Hospital s/n. Col. Ignacio Chávez., 85347 Empalme, Sonora", 27.9575303, -110.8236269, "museoFerrocarrilero.jpg", "El inicio del ferrocarril desde 1905 en Empalme.", "Empalme", "PuntoInteres", "http://i.imgur.com/9Fyr9.jpg")');
+     tx.executeSql('INSERT INTO tbl_puntoInteres (pagina, idDatosGenerales) VALUES ("www.empalme.sonora.gob.mx", 27)');
+    
+        }
+        
+        // Transaction error callback
+        //
+        function errorCB(tx, err) {
+            alert("Error processing SQL: "+err);
+        }
+    
+        // Transaction success callback
+        //
+        function successCB() {
+            var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(sentenciaSelect, errorCB);
+        }
+		
+		//Metodo que guarda la ciudad que el usuario selecciona en el menu principal de la aplicacion donde se encuentran las ciudades
+		function ciudadSeleccionada(ciudadSeleccionada){
+			ciudad = ciudadSeleccionada;
+			$('#tituloCiudad').html('<p>'+ciudad+' </p>');
+			$('#sobreAcerca').html('<p> <a href="#" onclick="showAlert();">Sobre '+ciudad+'</a> | <a href="#" onClick="acercaDe();">  Acerca de </p>');
+		}
+		
+		//Metodo que guarda la categoria que el usuario selecciona en el menu de categorias (restaurantes, hoteles, etc.)
+		function tipoSeleccionado(tipoSeleccionada){
+			tipo = tipoSeleccionada;
+			abrirDBCrearListas();	
+		}
+		
+		function abrirDBGenerales(tx){       
+        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+		
+         db.transaction(succesDatosGenerales, errorCB)
+        }	
+        
+        function succesDatosGenerales(tx){		
+      tx.executeSql('SELECT * FROM tbl_datosGenerales', [], datosGeneralesNombre, errorCB); 	     
+	 }
+	 
+     function datosGeneralesNombre(tx, results){
+      titulo=(results.rows.item(idDatosGenerales).nombre);
+      imagen=(results.rows.item(idDatosGenerales).imagen);
+      var direccion=(results.rows.item(idDatosGenerales).direccion);
+      descripcion=(results.rows.item(idDatosGenerales).descripcion);
+	  latitudConsulta = (results.rows.item(idDatosGenerales).latitud);
+	  longitudConsulta = (results.rows.item(idDatosGenerales).longitud);
+	  urlCompartir = (results.rows.item(idDatosGenerales).urlCompartir);
+        if(tipo=='Restaurantes'){
+			$('#titulo').html('<p>'+titulo+' </p>');
+        $('#imgDetalle').html('<img src="imagenes/restaurante/'+ciudad+'/'+imagen+'"/>');
+        $('#direccion').html('<p>'+direccion+' </p>');
+        $('#descripcion').html('<p>'+descripcion+' </p>');
+		$('#twitter').html('<a href="https://twitter.com/share?text=Me encuentro en '+titulo+' disfrutando de una rica comida" target="_blank"><img src="imagenes/Logo-twitter.png" align="right" width="15%" height="10%"/></a>');	
+		}if (tipo=='Hoteles'){
+			$('#tituloh').html('<p>'+titulo+' </p>');
+        $('#imgDetalleh').html('<img src="imagenes/restaurante/'+ciudad+'/'+imagen+'"/>');
+        $('#direccionh').html('<p>'+direccion+' </p>');
+        $('#descripcionh').html('<p>'+descripcion+' </p>');
+		$('#twitterh').html('<a href="https://twitter.com/share?text=Me encuentro en '+titulo+' disfrutando de sus instalaciones" target="_blank"><img src="imagenes/Logo-twitter.png" align="right" width="15%" height="10%"/></a>');
+		}if (tipo=='Compras'){
+			$('#tituloc').html('<p>'+titulo+' </p>');
+        $('#imgDetallec').html('<img src="imagenes/restaurante/'+ciudad+'/'+imagen+'"/>');
+        $('#direccionc').html('<p>'+direccion+' </p>');
+        $('#descripcionc').html('<p>'+descripcion+' </p>');
+		$('#twitterc').html('<a href="https://twitter.com/share?text=Me encuentro en '+titulo+' de compras pasandola bien" target="_blank"><img src="imagenes/Logo-twitter.png" align="right" width="15%" height="10%"/></a>');
+		}
+		if (tipo=='Diversion'){
+			$('#tituloo').html('<p>'+titulo+' </p>');
+        $('#imgDetalleo').html('<img src="imagenes/restaurante/'+ciudad+'/'+imagen+'"/>');
+        $('#direcciono').html('<p>'+direccion+' </p>');
+        $('#descripciono').html('<p>'+descripcion+' </p>');
+		$('#twittero').html('<a href="https://twitter.com/share?text=Me encuentro en '+titulo+' pasandola bien" target="_blank"><img src="imagenes/Logo-twitter.png" align="right" width="15%" height="10%"/></a>');
+		}if (tipo=='PuntoInteres'){
+		$('#titulot').html('<p>'+titulo+' </p>');
+        $('#imgDetallet').html('<img src="imagenes/restaurante/'+ciudad+'/'+imagen+'"/>');
+        $('#direcciont').html('<p>'+direccion+' </p>');
+        $('#descripciont').html('<p>'+descripcion+' </p>');
+		$('#twittert').html('<a href="https://twitter.com/share?text=Me encuentro en '+titulo+' disfrutando de un bonito lugar" target="_blank"><img src="imagenes/Logo-twitter.png" align="right" width="15%" height="10%"/></a>');
+		$('#galeria').html('<p><a href="#imagenes" onClick="galeria(1);"><img src="imagenes/galeria/'+titulo+'/001s.jpg"/ width="15%" height="15%"></a>  <a href="#imagenes" onClick="galeria(2);"><img src="imagenes/galeria/'+titulo+'/002s.jpg"/ width="15%" height="15%"></a>  <a href="#imagenes" onClick="galeria(3);"><img src="imagenes/galeria/'+titulo+'/003s.jpg"/ width="15%" height="15%"></a></p>');
+		}
+		
+	 }
+          function galeria(x){ 
+		  if(x==1){
+			$('#imgagenGaleria').html('<img src="imagenes/galeria/'+titulo+'/001.jpg"/>');  
+		  }else if(x==2){
+			$('#imgagenGaleria').html('<img src="imagenes/galeria/'+titulo+'/002.jpg"/>');    
+		  }else{
+			$('#imgagenGaleria').html('<img src="imagenes/galeria/'+titulo+'/003.jpg"/>');    
+		  }
+		  }
+
+		 
+		 //Metodo que abre la base de datos
+		     function abrirDBCrearListas(tx){       
+        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);		
+        db.transaction(succesCrearListas, errorCB)
+        }	
+        
+		//Metodo que sirve para crear una sentencia a la base de datos
+        function succesCrearListas(tx){		
+      tx.executeSql('SELECT * FROM tbl_datosGenerales', [], datosCrearListas, errorCB); 	     
+	 }
+	 	//Metodo en e cual se crean las listas dependiendo la  opcion que elijas
+     function datosCrearListas(tx, results){
+		var totalRegistros = (results.rows.length);
+		if(tipo== 'PuntoInteres'){
+		$('#tituloOpciones').html('<p >Puntos de interes</p>');
+		}else{
+			$('#tituloOpciones').html('<p>'+tipo+' </p>');
+		}
+		$('#lista').html('<ul data-role="listview" data-theme="a" data-filter="true" id="opcionesConsultadas">');
+		
+		 for(i=0;i<=totalRegistros-1;i++){
+			 var ciudadConsulta = (results.rows.item(i).ciudad);
+			 var tipoConsulta = (results.rows.item(i).tipo); 
+			 if(ciudadConsulta == ciudad && tipoConsulta == tipo){			 
+				var nombreConsulta = (results.rows.item(i).nombre);
+				var descripcionConsulta = (results.rows.item(i).descripcion);
+				$('#opcionesConsultadas').append('<li><a href="#'+tipo+'" onClick="idPlantilla('+i+');"><img src="imagenes/iconos/'+tipo+'.png"/><h3>'+nombreConsulta+'</h3><p>'+descripcionConsulta+'</p> </a></li>');
+				 
+			 }
+		 }    
+		 $('#lista').append('</ul');
+		 $('#opcionesConsultadas').listview();
+		 }
+		 
+		 function idPlantilla(idConsulta, tipoConsulta) {
+			 id=idConsulta; 
+		  if (tipo=='Restaurantes'){
+			   abrirDBrestaurante();  
+			 }else if(tipo=='Hoteles'){
+				 abrirDBhotel();
+				 }else if(tipo=='Compras'){
+					 abrirDBcompra();
+					 }else if(tipo=='Diversion'){
+						 abrirDBocio();
+						 }else if(tipo=='PuntoInteres'){
+							 abrirDBpuntoInteres();
+							 }			
+		 }
+		 //busqueda general
+		 function idPlantillaGeneral(idBusqueda,TipoBusqueda){
+			 id=idBusqueda;
+			 
+			 if (TipoBusqueda=='1'){
+				 tipo='Restaurantes';
+			   abrirDBrestaurante();  
+			 }else if(TipoBusqueda=='2'){
+				 tipo='Hoteles';
+				 abrirDBhotel();
+				 }else if(TipoBusqueda=='3'){
+					 tipo='Compras';
+					 abrirDBcompra();
+					 }else if(TipoBusqueda=='4'){
+						 tipo='Diversion';
+						 abrirDBocio();
+						 }else if(TipoBusqueda=='5'){
+							 tipo='PuntoInteres';
+							 abrirDBpuntoInteres();
+							 }		
+		 }
+		 //Favoritos agregados por el usuario
+		 function lala(idFavorito,ciudadFavorito,tipoFavorito){
+			  id=idFavorito;
+			  if(ciudadFavorito=='1'){
+			  ciudad='Guaymas';
+			  }else if(ciudadFavorito=='2'){
+			  ciudad='Empalme';
+			  }else{
+			  ciudad='San carlos';
+			  }
+			  if (tipoFavorito=='1'){
+				 tipo='Restaurantes';
+			   abrirDBrestaurante();  
+			 }else if(tipoFavorito=='2'){
+				 tipo='Hoteles';
+				 abrirDBhotel();
+				 }else if(tipoFavorito=='3'){
+					 tipo='Compras';
+					 abrirDBcompra();
+					 }else if(tipoFavorito=='4'){
+						 tipo='Diversion';
+						 abrirDBocio();
+						 }else if(tipoFavorito=='5'){
+							 tipo='PuntoInteres';
+							 abrirDBpuntoInteres();
+							 }	
+		 }
+		 
+		 
+		 function abrirDBrestaurante(tx){
+        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(sentenciaRestaurante, errorCB);
+        }
+        
+        function sentenciaRestaurante(tx){			
+          tx.executeSql('SELECT * FROM tbl_restaurante', [], datosRestaurante, errorCB);	
+        }
+        
+        function datosRestaurante(tx, results){
+			var numeroRegistros = (results.rows.length);
+			for(i =0;i<numeroRegistros;i++){
+				var idGeneralConsulta = (results.rows.item(i).idDatosGenerales)-1;
+				if(idGeneralConsulta == id){
+				idSeleccion = i;
+				break;	
+				}
+			}
+            var telefono=(results.rows.item(idSeleccion).telefono);
+            var cocina=(results.rows.item(idSeleccion).cocina);
+            var rangoPrecio=(results.rows.item(idSeleccion).rangoPrecio);
+            var pagina=(results.rows.item(idSeleccion).pagina);
+        $('#telefono').html('<p>'+telefono+' </p>');
+        $('#cocina').html('<p>'+cocina+' </p>');
+        $('#rangoPrecio').html('<p>'+rangoPrecio+' </p>');
+		if(pagina!=""){
+        $('#pagina').html(' <p>'+pagina+'</p>');
+		}else{
+			$('#pagina').html(' <p></p>');
+        }
+		 idDatosGenerales=(results.rows.item(idSeleccion).idDatosGenerales)-1;
+		abrirDBGenerales();
+		}
+		
+		 function abrirDBhotel(tx){
+			var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(sentenciaHotel, errorCB);
+			 }
+			 
+		 function sentenciaHotel(tx){
+			tx.executeSql('SELECT * FROM tbl_hotel', [], datosHotel, errorCB);
+			 }
+			 
+		function datosHotel(tx, results){
+			var numeroRegistros = (results.rows.length);
+			for(i =0;i<numeroRegistros;i++){
+				var idGeneralConsulta = (results.rows.item(i).idDatosGenerales)-1;
+				if(idGeneralConsulta == id){
+				idSeleccion = i;
+				break;	
+				}
+			}
+			  var telefono=(results.rows.item(idSeleccion).telefono);
+            var categoria=(results.rows.item(idSeleccion).categoria);
+            var rangoPrecio=(results.rows.item(idSeleccion).rangoPrecio);
+            var pagina=(results.rows.item(idSeleccion).pagina);
+      $('#telefonoh').html('<p>'+telefono+' </p>');
+        $('#categoriah').html('<img src="imagenes/estrellas/'+categoria+'"/>');
+        $('#rangoPrecioh').html('<p>'+rangoPrecio+' </p>');
+		if(pagina!=""){
+        $('#paginah').html(' <p>'+pagina+'</p>');
+		}else{
+			$('#paginah').html(' <p></p>');
+        }
+		idDatosGenerales=(results.rows.item(idSeleccion).idDatosGenerales)-1;
+		abrirDBGenerales();
+		
+		}
+		 
+		 function abrirDBcompra(tx){
+        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(sentenciaCompra, errorCB);
+        }
+        
+        function sentenciaCompra(tx){		
+		
+          tx.executeSql('SELECT * FROM tbl_compras', [], datosCompra, errorCB);	
+        }
+        
+        function datosCompra(tx, results){	
+			var numeroRegistros = (results.rows.length);
+			for(i =0;i<numeroRegistros;i++){
+				var idGeneralConsulta = (results.rows.item(i).idDatosGenerales)-1;
+				if(idGeneralConsulta == id){
+				idSeleccion = i;
+				break;	
+				}
+			}
+            var telefono=(results.rows.item(idSeleccion).telefono);
+            var pagina=(results.rows.item(idSeleccion).pagina);
+        $('#telefonoc').html('<p>'+telefono+' </p>');
+		if(pagina!=""){
+        $('#paginac').html(' <p>'+pagina+'</p>');
+		}else{
+			$('#paginac').html(' <p></p>');
+        }
+		 idDatosGenerales=(results.rows.item(idSeleccion).idDatosGenerales)-1;
+		abrirDBGenerales();
+		}
+		
+		function abrirDBocio(tx){
+			var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(sentenciaOcio, errorCB);
+			 }
+			 
+		 function sentenciaOcio(tx){
+			tx.executeSql('SELECT * FROM tbl_ocio', [], datosOcio, errorCB);
+			 }
+			 		 		 
+		function datosOcio(tx, results){
+			var numeroRegistros = (results.rows.length);
+			for(i =0;i<numeroRegistros;i++){
+				var idGeneralConsulta = (results.rows.item(i).idDatosGenerales)-1;
+				if(idGeneralConsulta == id){
+				idSeleccion = i;
+				break;	
+				}
+			}
+			  var telefono=(results.rows.item(idSeleccion).telefono);
+          
+      $('#telefonoo').html('<p>'+telefono+' </p>');
+        		
+		idDatosGenerales=(results.rows.item(idSeleccion).idDatosGenerales)-1;
+		abrirDBGenerales();
+		
+		}
+		
+		function abrirDBpuntoInteres(tx){
+			var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(sentenciaTuristicos, errorCB);
+			 }
+			 
+		 function sentenciaTuristicos(tx){
+			tx.executeSql('SELECT * FROM tbl_puntoInteres', [], datosTuristicos, errorCB);
+			 }
+			 
+		function datosTuristicos(tx, results){
+			var numeroRegistros = (results.rows.length);
+			for(i =0;i<numeroRegistros;i++){
+				var idGeneralConsulta = (results.rows.item(i).idDatosGenerales)-1;
+				if(idGeneralConsulta == id){
+				idSeleccion = i;
+				break;	
+				}
+			}
+			 var telefono=(results.rows.item(idSeleccion).telefono);          
+            var pagina=(results.rows.item(idSeleccion).pagina);
+		if(pagina!=""){
+        $('#paginat').html(' <p>'+pagina+'</p>');
+		}else{
+			$('#paginat').html(' <p></p>');
+        }
+		idDatosGenerales=(results.rows.item(idSeleccion).idDatosGenerales)-1;
+		abrirDBGenerales();
+		
+		}
+		//Metodo que abre la base de datos
+		 function abrirDBLargo(tx){       
+        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);		
+        db.transaction(succesLargo, errorCB)
+        }	
+        
+		//Metodo que sirve para crear una sentencia a la base de datos
+        function succesLargo(tx){		
+      tx.executeSql('SELECT * FROM tbl_favoritos', [], largoFavoritos, errorCB); 	     
+	 }
+	 	//Metodo en el cual se agrega un elemento a la tabla de favoritos
+     function largoFavoritos(tx, results){
+		 var numeroRegistrosFav = (results.rows.length);
+		 if(numeroRegistrosFav==0){
+		 largo = (results.rows.lenght)+1;
+		 abrirFavoritos();
+		 }else{
+		var yaAgregado = false;
+		for(i=0;i<numeroRegistrosFav;i++){
+			if(titulo == results.rows.item(i).nombre){
+				yaAgregado=true;
+				break;
+		 }
+		}
+		 if(yaAgregado==true){
+		 alertyaAgregado(); 
+		 }else{
+		 largo = (results.rows.lenght)+1;
+		 abrirFavoritos();
+		 }
+		
+		 }
+	 }
+	 
+	 function abrirFavoritos(tx){       
+        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);		
+        db.transaction(agregarFavoritos, errorCB)
+        }	
+	
+	 function agregarFavoritos(tx){
+tx.executeSql('insert into tbl_favoritos(idFavoritos, nombre, descripcion, tipo, imagen, ciudad, idDatosGenerales) values (?,?,?,?,?,?,?)',[largo, titulo, descripcion, tipo, imagen, ciudad, idDatosGenerales]);
+
+	 }
+	 
+	 function abrirDBListFav(tx){
+	 var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);		
+        db.transaction(sentenciaListFav, errorCB)
+	 }
+	 
+	  function sentenciaListFav(tx){
+		tx.executeSql('SELECT * FROM tbl_favoritos', [], crearListFav, errorCB); 
+	  }
+	 
+	  function crearListFav(tx, results){
+		var totalFav = (results.rows.length);
+		
+		 $('#listaFavoritos').html('<ul data-role="listview" data-theme="a" data-filter="true" id="favoritosConsultados">');	
+		 for(i=0;i<totalFav;i++){
+			var idFav = (results.rows.item(i).idFavoritos);
+			var tipoFav = (results.rows.item(i).tipo); 		 
+			var nombreFav = (results.rows.item(i).nombre);
+			var ciudadFav = (results.rows.item(i).ciudad);
+			var descripcionFav = (results.rows.item(i).descripcion);
+			var imagenFav = (results.rows.item(i).imagen);
+			var idDatosGrlFav = (results.rows.item(i).idDatosGenerales);
+			var ciudadParam;
+			if(ciudadFav=='Guaymas'){
+				ciudadParam='1';
+			}else if(ciudadFav=='Empalme'){
+				ciudadParam='2';
+			}else{
+			ciudadParam='3';
+			}
+			if(tipoFav=='Restaurantes'){
+		$('#favoritosConsultados').append('<li><a href="#Restaurantes" onClick="lala('+idDatosGrlFav+','+ciudadParam+',1);"><img src="imagenes/restaurante/'+ciudadFav+'/'+imagenFav+'"/><h3>'+nombreFav+'</h3><p>'+descripcionFav+'</p> </a></li>');
+			}
+		  if(tipoFav=='Hoteles'){
+		$('#favoritosConsultados').append('<li><a href="#Hoteles" onClick="lala('+idDatosGrlFav+','+ciudadParam+',2);"><img src="imagenes/restaurante/'+ciudadFav+'/'+imagenFav+'"/><h3>'+nombreFav+'</h3><p>'+descripcionFav+'</p> </a></li>');
+			}
+		  if(tipoFav=='Compras'){
+		$('#favoritosConsultados').append('<li><a href="#Compras" onClick="lala('+idDatosGrlFav+','+ciudadParam+',3);"><img src="imagenes/restaurante/'+ciudadFav+'/'+imagenFav+'"/><h3>'+nombreFav+'</h3><p>'+descripcionFav+'</p> </a></li>');
+			}
+		  if(tipoFav=='Diversion'){
+		$('#favoritosConsultados').append('<li><a href="#Diversion" onClick="lala('+idDatosGrlFav+','+ciudadParam+',4);"><img src="imagenes/restaurante/'+ciudadFav+'/'+imagenFav+'"/><h3>'+nombreFav+'</h3><p>'+descripcionFav+'</p> </a></li>');
+			}
+			if(tipoFav=='PuntoInteres'){
+		$('#favoritosConsultados').append('<li><a href="#PuntoInteres" onClick="lala('+idDatosGrlFav+','+ciudadParam+',5);"><img src="imagenes/restaurante/'+ciudadFav+'/'+imagenFav+'"/><h3>'+nombreFav+'</h3><p>'+descripcionFav+'</p> </a></li>');
+			}
+			 
+		 }    
+		 $('#listaFavoritos').append('</ul');
+		 $('#favoritosConsultados').listview();
+	 }
+	 
+	 		function abrirDBListFavGral(tx){
+			var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(sentenciaTuristicosGral, errorCB);
+			 }
+			 
+		 function sentenciaTuristicosGral(tx){
+			tx.executeSql('SELECT * FROM tbl_datosGenerales', [], datosTuristicosGral, errorCB);
+			 }
+			 
+		function datosTuristicosGral(tx, results){
+			var numeroRegistros = (results.rows.length);
+					 $('#listaFavoritosGral').html('<ul data-role="listview" data-theme="a" data-filter="true" id="favoritosConsultadosGral">');	
+		 for(i=0;i<numeroRegistros;i++){
+			 var ciudadFavGrl = (results.rows.item(i).ciudad);
+			var idFavGrl = (results.rows.item(i).idFavoritos);
+			var tipoFavGrl = (results.rows.item(i).tipo); 		 
+			var nombreFavGrl = (results.rows.item(i).nombre);
+			var descripcionFavGrl = (results.rows.item(i).descripcion);
+			var imagenFavGrl = (results.rows.item(i).imagen);
+			if(ciudadFavGrl == ciudad){
+			if(tipoFavGrl=='Restaurantes'){
+				$('#favoritosConsultadosGral').append('<li><a href="#Restaurantes" onClick="idPlantillaGeneral('+i+',1);"><img src="imagenes/restaurante/imagenesFav/'+imagenFavGrl+'"/><h3>'+nombreFavGrl+'</h3><p>'+descripcionFavGrl+'</p> </a></li>');
+			}
+			if(tipoFavGrl=='Hoteles'){
+				$('#favoritosConsultadosGral').append('<li><a href="#Hoteles" onClick="idPlantillaGeneral('+i+',2);"><img src="imagenes/restaurante/imagenesFav/'+imagenFavGrl+'"/><h3>'+nombreFavGrl+'</h3><p>'+descripcionFavGrl+'</p> </a></li>');
+			}
+			if(tipoFavGrl=='Compras'){
+				$('#favoritosConsultadosGral').append('<li><a href="#Compras" onClick="idPlantillaGeneral('+i+',3);"><img src="imagenes/restaurante/imagenesFav/'+imagenFavGrl+'"/><h3>'+nombreFavGrl+'</h3><p>'+descripcionFavGrl+'</p> </a></li>');
+			}
+			if(tipoFavGrl=='Diversion'){
+				$('#favoritosConsultadosGral').append('<li><a href="#Diversion" onClick="idPlantillaGeneral('+i+',4);"><img src="imagenes/restaurante/imagenesFav/'+imagenFavGrl+'"/><h3>'+nombreFavGrl+'</h3><p>'+descripcionFavGrl+'</p> </a></li>');
+			}
+			if(tipoFavGrl=='PuntoInteres'){
+				$('#favoritosConsultadosGral').append('<li><a href="#PuntoInteres" onClick="idPlantillaGeneral('+i+',5);"><img src="imagenes/restaurante/imagenesFav/'+imagenFavGrl+'"/><h3>'+nombreFavGrl+'</h3><p>'+descripcionFavGrl+'</p> </a></li>');
+			}
+			
+			}
+		 }    
+		 $('#listaFavoritosGral').append('</ul');
+		 $('#favoritosConsultadosGral').listview();
+		}
+		
+		function abrirDBArregloMapa(tx){
+			var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(sentenciaArregloMapa, errorCB);
+			 }
+			 
+		 function sentenciaArregloMapa(tx){
+			tx.executeSql('SELECT * FROM tbl_datosGenerales', [], datosArregloMapa, errorCB);
+			 }
+			 
+		function datosArregloMapa(tx, results){
+			var posiciones = (results.rows.length);
+			var contador=0;
+			for(i=0;i<posiciones;i++){
+			var ciudadMapa=(results.rows.item(i).ciudad);
+			if(ciudad==ciudadMapa){
+			contador++;	
+			}
+			}
+			arregloCordenadas=new Array(contador);
+			for(i=0;i<contador;i++){
+				arregloCordenadas[i]= new Array(4);
+			}
+			var x=0;
+			for(i=0;i<posiciones-1;i++){
+			var latitud = (results.rows.item(i).latitud);
+			var longitud = (results.rows.item(i).longitud);
+			var tituloMapa = (results.rows.item(i).nombre);
+			var descripcionMapa = (results.rows.item(i).descripcion); 
+			var ciudadMapa2=(results.rows.item(i).ciudad);
+			if(ciudad==ciudadMapa2){		
+			arregloCordenadas[x][0]=latitud;
+            arregloCordenadas[x][1]=longitud;
+			arregloCordenadas[x][2]=tituloMapa;
+            arregloCordenadas[x][3]=descripcionMapa;
+			x++;
+			}
+			}
+			mapaMarker();
+			
+		}
+		
+		function showAlert() {
+		if(ciudad=="Guaymas"){
+        navigator.notification.alert(
+            'Sobre  Guaymas:\nHeroica Guaymas conocida como "La Perla del Mar de Cortés" es una ciudad y puerto del estado mexicano de Sonora.\nEs una de las principales ciudades productoras de camarón en el norte de México y anteriormente también fue destacada por su captura de ostras.\n\nDesde sus inicios, Guaymas se destacó por tener un economía fundamentada principalmente en la pesca y otras actividades relacionadas con el mar. Sin embargo, con la paulatina escasez de recursos pesqueros que se ha venido dando en la región en las últimas décadas y con el incremento de la contaminación marina, el sustento de su economía ha tenido que buscar otras vertientes, hasta el punto de que actualmente gran parte de la actividad laboral guaymense de basa en la industria maquiladora y en el turismo.');}
+			else if(ciudad=="Empalme"){
+				        navigator.notification.alert(
+            'Sobre  Empalme:\n Empalme es uno de los 72 municipios del estado mexicano de Sonora. Se ubica al sur del estado y su cabecera es la población de Empalme. Colinda al norte, este y oeste con Guaymas, y al sur con el Golfo de Baja California y tiene una altura de 7 metros sobre el nivel del mar. Se le conoce como "La Ciudad Jardín"; por su gran cantidad de árboles que existen en la localidad.\n\n En Empalme Podrás Disfrutar de:\n La playas de arena blanca y pendientes suaves son el escenario del espectáculo único que se repite los primeros meses de cada año, esta ciudad nos regala la magia de su entorno y hermosas maravillas de la naturaleza, como el parque de cactus gigantes, muchos de ellos de edad milenaria que superan los tres metros de altura, cuenta con un museo que exhibe las artesanías más representativas del su gente y de sus ancestros; está localizado en el jardín del Sindicato Ferrocarrilero.');
+			}
+    }
+	
+		    function acercaDe() {
+        navigator.notification.alert(
+      'Desarrollado por:\nMaria Elisa Barreras Rios\nJessica Haydee Lopez Castañeda\nGuillermo Eduardo Navarrete Leon\nEdgar Orlando Mendivil Laurean\nguiasphonegap@gmai.com\nNoviembre del 2012');
+    }
+	        function alertyaAgregado(){
+				navigator.notification.alert(
+            'El elemento que deseas agregar ya ha sido agregado anteriormente');
+			}
+		
+		
+		function comoLlegar(){			
+        navigator.geolocation.getCurrentPosition(onSuccess, onError);		
+        }
+		
+		function onSuccess(position){
+       latitud = position.coords.latitude;
+	   longitud = position.coords.longitude;
+		initialize();
+		}
+		   function onError() {
+        alert('onError!');
+    }
+		 
+        </script>
+<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCGf52hOoub7DZhbFHS6ynD1M8f8MIjJxA&sensor=true">
+    </script>
+	 <script type="text/javascript">
+    var directionDisplay;
+    var directionsService = new google.maps.DirectionsService();
+    
+	var latM;
+	var lngM;
+
+     function initialize(latitud, longitud,latitudConsulta, longitudConsulta) {
+        directionsDisplay = new google.maps.DirectionsRenderer();
+        var chicago = new google.maps.LatLng(27.9139609,-110.9020720);
+        var myOptions = {
+            zoom: 6,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            center: chicago
+        };
+        var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+        directionsDisplay.setMap(map);
+        calcRoute();
+    }
+	
+	function mapaMarker(){
+	if(ciudad=='Guaymas'){
+		latM=27.9139609;
+		lngM=-110.9020720;
+	}else if(ciudad=='Empalme'){
+		latM=27.9640614;
+		lngM=-110.8086114;
+	}else{
+		latM=27.96748322879787;
+		lngM=-111.02697372436523;	
+	}
+	var mapOptions = {
+		center: new	google.maps.LatLng(latM,lngM),
+		zoom: 13,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	var mapMarker = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+		
+				for(i=0;i<arregloCordenadas.length;i++){
+			var lat=arregloCordenadas[i][0];
+			var lng=arregloCordenadas[i][1];
+			var marker = new google.maps.Marker({
+				position: new google.maps.LatLng(lat,lng),
+				/*animation: google.maps.Animation.DROP,*/
+				map: mapMarker,
+				title: arregloCordenadas[i][2]
+			});
+						var informacion=new google.maps.InfoWindow({
+				content: arregloCordenadas[i][3]
+			});
+
+		}
+/*		function toggleBounce() {
+
+        if (marker.getAnimation() != null) {
+          marker.setAnimation(null);
+        } else {
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+        }
+      }*/
+	}
+
+    function calcRoute() {
+
+        var waypts = [];
+
+        start  = new google.maps.LatLng(latitud,longitud);		
+        end = new google.maps.LatLng(latitudConsulta,longitudConsulta);
+        var request = {
+            origin: start,
+            destination: end,
+            waypoints: waypts,
+            optimizeWaypoints: true,
+            travelMode: google.maps.DirectionsTravelMode.WALKING
+        };
+		console.log(latitud);
+        directionsService.route(request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+                var route = response.routes[0];
+
+            }
+        });
+    }
+        </script>
+<script src='http://connect.facebook.net/en_US/all.js'></script>
+<script> 
+      FB.init({appId: "384433688305842", status: true, cookie: true});
+
+         function postToFeed() {
+
+        // calling the API ...
+        var obj = {
+          method: 'feed',
+          redirect_uri: 'https://quiet-gorge-2989.herokuapp.com/',
+          link: 'https://quiet-gorge-2989.herokuapp.com/',
+          picture: urlCompartir,
+          name: 'Guias Turisticas Virtuales Multiplataforma',
+          caption: titulo,
+          description: descripcion
+        };
+
+        function callback(response) {
+          document.getElementById('msg').innerHTML = "Post ID: " + response['post_id'];
+        }
+
+        FB.ui(obj, callback);
+      }
+    
+    </script>
+  
+ 
+</head> 
+
+<body > 
+
+<div data-role="page"    id="Inicio"> 
+     <h1>Guías Virtuales</h1><hr> 
+     <div id="botonesCiudad"> 
+       <a href="#menu"  class="ico_guaymas" onClick="ciudadSeleccionada('Guaymas');">Guaymas</a>  
+       <a href="#menu"class="ico_empalme" onClick="ciudadSeleccionada('Empalme');">Empalme</a> 
+       <a href="#menu" class="ico_sancarlos" onClick="ciudadSeleccionada('San carlos');">San Carlos</a>  <br/> <br/>
+       <img src="imagenes/logo.png" alt="logo" style="width:100%; max-height:300px; max-width:750px;  display:block; margin:0 auto;"> 
+     </div> <!--botones ciudad-->
+</div>
+
+
+<div data-role="page" id="menu">
+           <div data-role="header" data-backbtn="true"><h2 style="position:relative;top:15px; font-size:20px; left:-40px; z-index:10;" id="tituloCiudad"></h2> </div>
+           <img src="imagenes/logo.png" alt="logo"height="70" style=" position:absolute; display:block; top:20px; right:0;" /><br /><br />
+           <div id="botones">     
+	  <a href="#mapaGuaymas" onClick="abrirDBArregloMapa();" class="color_cafe"><img  src="imagenes/iconos/un_pixel.png"class="iconos_secciones icono_mapa"/ > Mapa de la ciudad</a> 
+	  <a href="#opciones" class="color_rojo" onClick="tipoSeleccionado('Restaurantes');"><img  src="imagenes/iconos/un_pixel.png" class="iconos_secciones icono_restaurantes"/>Restaurantes</a>
+      <a href="#opciones"class="color_morado" onClick="tipoSeleccionado('Hoteles');"><img  src="imagenes/iconos/un_pixel.png" class="iconos_secciones icono_hoteles"/>Hoteles</a>
+	  <a href="#opciones"class="color_verde" onClick="tipoSeleccionado('Compras');"><img  src="imagenes/iconos/un_pixel.png" class="iconos_secciones icono_compras"/>Compras</a>
+	  <a href="#opciones"class="color_azul" onClick="tipoSeleccionado('Diversion');"><img  src="imagenes/iconos/un_pixel.png" class="iconos_secciones icono_diversion"/>Diversion</a>
+	  <a href="#opciones"class="color_amarillo" onClick="tipoSeleccionado('PuntoInteres');"><img  src="imagenes/iconos/un_pixel.png" class="iconos_secciones icono_puntos"/>Puntos de interes</a>
+	    
+    </div><div align="center" id="sobreAcerca"></div> 
+    
+    
+<div data-role="footer" data-id="foo">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#Inicio" data-icon="home">Inicio</a></li>
+			<li><a href="#favoritosGral" onClick="abrirDBListFavGral();" data-icon="search">Buscar</a></li>
+			<li><a href="#favoritos" onClick="abrirDBListFav();" data-icon="star">Favoritos</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+
+</div>
+</div>
+  
+  <div data-role="page" id="opciones">
+  <div data-role="header" data-backbtn="true">
+  <p align="center" id=tituloOpciones></p>
+  </div>
+  <section id="lista">
+  </section>  
+  </div>
+  
+  <div data-role="page" id="Restaurantes">
+<div data-role="header"> <h1 id="titulo"></h1></div>
+
+<div id="imgDetalle"></div>       <div class="dirTel">
+									<p> Dirección: </p>
+                                  <div id="direccion"> </div>
+                                  <p id="telefono"></p> <br><br>
+                                  <a  href="#mapaGuaymas" id="llegaraqui" onClick="comoLlegar();" >Ruta hasta Aquí</a>     </div>
+
+<div style="clear:both;"></div>
+ <div class="descripcion">
+  <p > Cocina: </p>
+ <p id="cocina"> </p>
+   <p> Rango de Precios: </p>
+ <p id="rangoPrecio"> </p>
+ <p> Descripcion: </p>
+ <p id="descripcion"></p>
+ <p id="pagina"> </p> 
+  <a onClick="postToFeed(); return false;"><img src="imagenes/icono-facebook.png" align="right" width="15%" height="10%"/></a>
+  <div id="twitter"></div>
+ </div>
+<div data-role="footer" data-id="foo1">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#Inicio" data-icon="home">Inicio</a></li>
+			<li><a href="#favoritos" onClick="abrirDBLargo(); abrirDBListFav();" data-icon="star">Favoritos</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+  </div>
+  
+   <div data-role="page" id="Hoteles">
+<div data-role="header"> <h1 id="tituloh"></h1></div>
+
+<div id="imgDetalleh"></div>       <div class="dirTel">
+									<p> Dirección: </p>
+                                  <div id="direccionh"> </div>
+                                 <p id="telefonoh"></p> <br><br>
+                                  <a  href="#mapaGuaymas" id="llegaraquih" onClick="comoLlegar();" >Ruta hasta Aquí</a>     </div>
+
+<div style="clear:both;"></div>
+ <div class="descripcion">
+  <p > Categoria: </p>
+ <div id="categoriah"> </div>
+   <p> Rango de Precios: </p>
+ <p id="rangoPrecioh"> </p>
+ <p> Descripcion: </p>
+ <p id="descripcionh"></p>
+ <p id="paginah"> </p>
+  <a onClick="postToFeed(); return false;"><img src="imagenes/icono-facebook.png" align="right" width="15%" height="10%"/></a>
+<div id="twitterh"></div>
+ </div>
+<div data-role="footer" data-id="foo1">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#Inicio" data-icon="home">Inicio</a></li>
+			<li><a href="#favoritos" onClick="abrirDBLargo(); abrirDBListFav();" data-icon="star">Favoritos</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+  </div>
+  
+  <div data-role="page" id="Compras">
+<div data-role="header"> <h1 id="tituloc"></h1></div>
+
+<div id="imgDetallec"></div>       <div class="dirTel">
+									<p> Dirección: </p>
+                                  <div id="direccionc"> </div>
+                                 <p id="telefonoc"></p> <br><br>
+                                  <a  href="#mapaGuaymas" id="llegaraquic" onClick="comoLlegar();" >Ruta hasta Aquí</a>     </div>
+
+<div style="clear:both;"></div>
+ <div class="descripcion">
+ <p> Descripcion: </p>
+ <p id="descripcionc"></p>
+ <p id="paginac"> </p>
+  <a onClick="postToFeed(); return false;"><img src="imagenes/icono-facebook.png" align="right" width="15%" height="10%"/></a>
+<div id="twitterc"></div>
+ </div>
+<div data-role="footer" data-id="foo1">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#Inicio" data-icon="home">Inicio</a></li>
+			<li><a href="#favoritos" onClick="abrirDBLargo(); abrirDBListFav();" data-icon="star">Favoritos</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+  </div>
+  
+  <div data-role="page" id="Diversion">
+<div data-role="header"> <h1 id="tituloo"></h1></div>
+
+<div id="imgDetalleo"></div>       <div class="dirTel">
+									<p> Dirección: </p>
+                                  <div id="direcciono"> </div>
+                                 <p id="telefonoo"></p> <br><br>
+                                  <a  href="#mapaGuaymas" id="llegaraquio" onClick="comoLlegar();" >Ruta hasta Aquí</a>     </div>
+
+<div style="clear:both;"></div>
+ <div class="descripcion">
+     <p> Descripcion: </p>
+ <p id="descripciono"></p>
+  <a onClick="postToFeed(); return false;"><img src="imagenes/icono-facebook.png" align="right" width="15%" height="10%"/></a>
+  <div id="twittero"></div>
+ </div>
+<div data-role="footer" data-id="foo1">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#Inicio" data-icon="home">Inicio</a></li>
+			<li><a href="#favoritos" onClick="abrirDBLargo(); abrirDBListFav();" data-icon="star">Favoritos</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+  </div>
+  
+   <div data-role="page" id="PuntoInteres">
+<div data-role="header"> <h1 id="titulot"></h1></div>
+
+<div id="imgDetallet"></div>       <div class="dirTel">
+									<p> Dirección: </p>
+                                  <div id="direcciont"> </div>
+                                  <a  href="#mapaGuaymas" id="llegaraquit" onClick="comoLlegar();" >Ruta hasta Aquí</a>     </div>
+
+<div style="clear:both;"></div>
+<div id="galeria"></div>
+ <div class="descripcion">
+ <p> Descripcion: </p>
+ <p id="descripciont"></p>
+ <p id="paginat"> </p>
+  <a onClick="postToFeed(); return false;"><img src="imagenes/icono-facebook.png" align="right" width="15%" height="10%"/></a>
+<div id="twittert"></div>
+ </div>
+ <div data-role="footer" data-id="foo1">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#Inicio" data-icon="home">Inicio</a></li>
+			<li><a href="#favoritos" onClick="abrirDBLargo(); abrirDBListFav();" data-icon="star">Favoritos</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+  </div>
+  
+   <div data-role="page" id="imagenes">
+<div data-role="header"> <h1>Galeria</h1></div>
+
+<div id="imgagenGaleria"></div>
+
+
+  </div>
+  
+  
+ <div  data-role="page" id="mapaGuaymas">
+ <div data-role="header"><h1> Mapa de la ciudad</h1></div>
+ <div id="map_canvas" style="width: 100%; height: 100%"></div>
+ </div>  
+
+ <div data-role="page" id="favoritos">
+<div data-role="header"> <h1>Favoritos</h1></div>
+<section id="listaFavoritos">
+  </section>  
+</div>
+  
+ <div data-role="page" id="favoritosGral">
+<div data-role="header"><h1>Busqueda</h1></div>
+<section id="listaFavoritosGral">
+  </section>  
+</div>
+  
+</body>
+</html>
