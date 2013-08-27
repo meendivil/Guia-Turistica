@@ -1,0 +1,11 @@
+{
+    "name":"Guias Turisticas Guaymas",
+    "developer": {
+        "name":"Edgar Orlando Mendivil Laurean",
+        "url":"http://www.itson.edu.mx"
+    },
+    "description":"Guias turisticas virtuales para las ciudades de Guaymas Empalme y San Carlos.",
+    "icons":{
+        "128":"/icon.png"
+    }
+}
